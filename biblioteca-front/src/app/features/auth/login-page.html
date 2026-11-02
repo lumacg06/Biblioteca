@@ -1,0 +1,21 @@
+<section class="tarjeta tarjeta-acceso">
+  <h1>Biblioteca</h1>
+  <p class="ayuda">Inicia sesión con tu documento y contraseña.</p>
+
+  <form [formGroup]="form" (ngSubmit)="iniciarSesion()" class="formulario-vertical">
+    <label>
+      Documento
+      <input formControlName="documento" autocomplete="username" />
+    </label>
+    <label>
+      Contraseña
+      <input type="password" formControlName="contrasena" autocomplete="current-password" />
+    </label>
+    @if (form.touched && form.invalid) {
+      <p class="error-campo">Escribe tu documento y tu contraseña.</p>
+    }
+    <button type="submit" [disabled]="enviando()">Iniciar sesión</button>
+  </form>
+
+  <p class="ayuda">¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+</section>

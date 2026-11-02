@@ -1,0 +1,43 @@
+<section class="tarjeta tarjeta-acceso">
+  <h1>Crear cuenta</h1>
+
+  <form [formGroup]="form" (ngSubmit)="registrar()" class="formulario-vertical">
+    <label>
+      Nombre completo
+      <input formControlName="nombre" autocomplete="name" />
+    </label>
+    <label>
+      Documento
+      <input formControlName="documento" autocomplete="username" />
+    </label>
+    <label>
+      Soy
+      <select formControlName="tipo">
+        <option value="ESTUDIANTE">
+          Estudiante (hasta {{ reglas.ESTUDIANTE.limitePrestamos }} libros, {{ reglas.ESTUDIANTE.plazoDias }} días)
+        </option>
+        <option value="DOCENTE">
+          Docente (hasta {{ reglas.DOCENTE.limitePrestamos }} libros, {{ reglas.DOCENTE.plazoDias }} días)
+        </option>
+      </select>
+    </label>
+    <label>
+      Contraseña
+      <input type="password" formControlName="contrasena" autocomplete="new-password" />
+    </label>
+    <label>
+      Repite la contraseña
+      <input type="password" formControlName="confirmacion" autocomplete="new-password" />
+    </label>
+
+    @if (form.touched && form.invalid) {
+      <p class="error-campo">Completa todos los campos. La contraseña debe tener al menos {{ longitudMinima }} caracteres.</p>
+    }
+    @if (contrasenasDistintas()) {
+      <p class="error-campo">Las contraseñas no coinciden.</p>
+    }
+    <button type="submit" [disabled]="enviando()">Crear cuenta</button>
+  </form>
+
+  <p class="ayuda">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+</section>
