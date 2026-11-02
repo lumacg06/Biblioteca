@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "biblioteca-front",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start", "--prefix", "biblioteca-front", "--", "--port", "4201"],
+      "port": 4201,
+      "autoPort": false
+    }
+  ]
+}
