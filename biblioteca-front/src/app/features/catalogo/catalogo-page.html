@@ -1,0 +1,54 @@
+<h1>Catálogo</h1>
+
+<section class="tarjeta">
+  <form [formGroup]="form" (ngSubmit)="buscar()" class="formulario">
+    <label>
+      Buscar por
+      <select formControlName="campo">
+        <option value="titulo">Título</option>
+        <option value="autor">Autor</option>
+        <option value="isbn">ISBN</option>
+      </select>
+    </label>
+    <label class="crece">
+      Texto
+      <input formControlName="texto" placeholder="Escribe para buscar..." />
+    </label>
+    <button type="submit">Buscar</button>
+    <button type="button" class="secundario" (click)="limpiar()">Ver todos</button>
+  </form>
+  <p class="ayuda">Para llevarte un libro, acércate al mostrador de la biblioteca.</p>
+
+  @if (libros().length === 0) {
+    <p class="vacio">No hay libros para mostrar.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Autor</th>
+          <th>ISBN</th>
+          <th>Disponibilidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (libro of libros(); track libro.libroId) {
+          <tr>
+            <td>{{ libro.titulo }}</td>
+            <td>{{ libro.autor }}</td>
+            <td>{{ libro.isbn }}</td>
+            <td>
+              @if (libro.ejemplaresDisponibles > 0) {
+                <span class="badge badge-disponible">
+                  {{ libro.ejemplaresDisponibles }} de {{ libro.totalEjemplares }} disponibles
+                </span>
+              } @else {
+                <span class="badge badge-perdido">No disponible</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

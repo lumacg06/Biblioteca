@@ -1,0 +1,126 @@
+<h1>Hola, {{ sesion.usuario()?.nombre }}</h1>
+
+<section class="tarjeta">
+  <div class="indicadores">
+    <div class="indicador">
+      <span>Préstamos activos</span>
+      <strong>
+        {{ prestamosActivos().length }}
+        @if (reglas(); as r) {
+          <small>de {{ r.limitePrestamos }}</small>
+        }
+      </strong>
+    </div>
+    <div class="indicador">
+      <span>Plazo por préstamo</span>
+      <strong>{{ reglas()?.plazoDias ?? '—' }} <small>días</small></strong>
+    </div>
+    <div class="indicador">
+      <span>Multas pendientes</span>
+      <strong>{{ totalPendiente() | pesos }}</strong>
+    </div>
+  </div>
+  @if (multasPendientes().length > 0) {
+    <p class="error-campo">
+      Tienes multas sin pagar: no puedes pedir libros nuevos hasta pagarlas en la biblioteca.
+    </p>
+  }
+</section>
+
+<section class="tarjeta">
+  <h2>Mis préstamos activos</h2>
+  @if (prestamosActivos().length === 0) {
+    <p class="vacio">No tienes libros prestados.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Libro</th>
+          <th>Ejemplar</th>
+          <th>Prestado</th>
+          <th>Devolver antes de</th>
+          <th>Tiempo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (prestamo of prestamosActivos(); track prestamo.id) {
+          <tr [class.vencido]="diasRestantes(prestamo) < 0">
+            <td>{{ prestamo.ejemplar.libro.titulo }}</td>
+            <td>{{ prestamo.ejemplar.codigo }}</td>
+            <td>{{ prestamo.fechaPrestamo }}</td>
+            <td>{{ prestamo.fechaVencimiento }}</td>
+            <td>
+              @if (diasRestantes(prestamo) < 0) {
+                <span class="badge badge-perdido">{{ -diasRestantes(prestamo) }} días de retraso</span>
+              } @else {
+                <span class="badge badge-activo">Quedan {{ diasRestantes(prestamo) }} días</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
+
+<section class="tarjeta">
+  <h2>Mis multas</h2>
+  @if (multas().length === 0) {
+    <p class="vacio">No tienes multas.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Libro</th>
+          <th>Días de retraso</th>
+          <th>Valor</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (multa of multas(); track multa.id) {
+          <tr>
+            <td>{{ multa.prestamo.ejemplar.libro.titulo }}</td>
+            <td>{{ multa.diasRetraso }}</td>
+            <td>{{ multa.valor | pesos }}</td>
+            <td>
+              @if (multa.pagada) {
+                <span class="badge badge-devuelto">PAGADA</span>
+              } @else {
+                <span class="badge badge-perdido">PENDIENTE</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
+
+<section class="tarjeta">
+  <h2>Historial</h2>
+  @if (historial().length === 0) {
+    <p class="vacio">Aún no has devuelto ningún libro.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Libro</th>
+          <th>Prestado</th>
+          <th>Devuelto</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (prestamo of historial(); track prestamo.id) {
+          <tr>
+            <td>{{ prestamo.ejemplar.libro.titulo }}</td>
+            <td>{{ prestamo.fechaPrestamo }}</td>
+            <td>{{ prestamo.fechaDevolucion ?? '—' }}</td>
+            <td><app-estado-badge [estado]="prestamo.estado" /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
