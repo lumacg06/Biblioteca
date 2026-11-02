@@ -1,0 +1,61 @@
+<h1>Multas</h1>
+
+<section class="tarjeta">
+  <div class="formulario">
+    <label class="crece">
+      Usuario
+      <select #filtro (change)="filtrarPorUsuario(filtro.value)">
+        <option value="">Todos los usuarios</option>
+        @for (usuario of usuarios(); track usuario.id) {
+          <option [value]="usuario.id">{{ usuario.nombre }} · {{ usuario.documento }}</option>
+        }
+      </select>
+    </label>
+    <div class="resumen">
+      Pendiente por pagar
+      <strong>{{ totalPendiente() | pesos }}</strong>
+    </div>
+  </div>
+  <p class="ayuda">$1.000 por cada día de atraso. Un usuario con multas pendientes no puede pedir préstamos.</p>
+
+  @if (multas().length === 0) {
+    <p class="vacio">No hay multas.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Usuario</th>
+          <th>Préstamo</th>
+          <th>Días de retraso</th>
+          <th>Valor</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (multa of multas(); track multa.id) {
+          <tr>
+            <td>{{ multa.id }}</td>
+            <td>{{ multa.usuario.nombre }}</td>
+            <td>#{{ multa.prestamo.id }} · {{ multa.prestamo.ejemplar.libro.titulo }}</td>
+            <td>{{ multa.diasRetraso }}</td>
+            <td>{{ multa.valor | pesos }}</td>
+            <td>
+              @if (multa.pagada) {
+                <span class="badge badge-devuelto">PAGADA</span>
+              } @else {
+                <span class="badge badge-perdido">PENDIENTE</span>
+              }
+            </td>
+            <td class="acciones">
+              @if (!multa.pagada) {
+                <button type="button" [disabled]="guardando()" (click)="pagar(multa)">Pagar</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

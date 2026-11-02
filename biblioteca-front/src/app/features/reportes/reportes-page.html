@@ -1,0 +1,56 @@
+<div class="titulo-con-accion">
+  <h1>Reportes</h1>
+  <button type="button" class="secundario" (click)="actualizar()">Actualizar</button>
+</div>
+
+<section class="tarjeta">
+  <h2>Inventario de ejemplares</h2>
+  @if (inventario(); as inv) {
+    <div class="indicadores">
+      <div class="indicador">
+        <span>Total</span>
+        <strong>{{ totalEjemplares() }}</strong>
+      </div>
+      @for (estado of estados; track estado) {
+        <div class="indicador">
+          <app-estado-badge [estado]="estado" />
+          <strong>{{ inv[estado] }}</strong>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="vacio">No se pudo cargar el inventario.</p>
+  }
+</section>
+
+<section class="tarjeta">
+  <h2>Préstamos vencidos al {{ hoy }}</h2>
+  @if (vencidos().length === 0) {
+    <p class="vacio">No hay préstamos vencidos.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Usuario</th>
+          <th>Documento</th>
+          <th>Ejemplar</th>
+          <th>Venció</th>
+          <th>Días vencido</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (prestamo of vencidos(); track prestamo.id) {
+          <tr class="vencido">
+            <td>{{ prestamo.id }}</td>
+            <td>{{ prestamo.usuario.nombre }}</td>
+            <td>{{ prestamo.usuario.documento }}</td>
+            <td>{{ prestamo.ejemplar.codigo }} · {{ prestamo.ejemplar.libro.titulo }}</td>
+            <td>{{ prestamo.fechaVencimiento }}</td>
+            <td>{{ diasVencido(prestamo) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

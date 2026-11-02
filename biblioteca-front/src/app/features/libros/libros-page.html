@@ -1,0 +1,137 @@
+<h1>Libros</h1>
+
+<section class="tarjeta">
+  <h2>Registrar libro</h2>
+  <form [formGroup]="formLibro" (ngSubmit)="registrarLibro()" class="formulario">
+    <label>
+      Título
+      <input formControlName="titulo" placeholder="Clean Code" />
+    </label>
+    <label>
+      Autor
+      <input formControlName="autor" placeholder="Robert C. Martin" />
+    </label>
+    <label>
+      ISBN
+      <input formControlName="isbn" placeholder="978-0132350884" />
+    </label>
+    <button type="submit" [disabled]="guardando()">Registrar</button>
+  </form>
+  @if (formLibro.touched && formLibro.invalid) {
+    <p class="error-campo">Título, autor e ISBN son obligatorios.</p>
+  }
+</section>
+
+<section class="tarjeta">
+  <h2>Catálogo y disponibilidad</h2>
+  <form [formGroup]="formBusqueda" (ngSubmit)="buscar()" class="formulario">
+    <label>
+      Buscar por
+      <select formControlName="campo">
+        <option value="titulo">Título</option>
+        <option value="autor">Autor</option>
+        <option value="isbn">ISBN</option>
+      </select>
+    </label>
+    <label class="crece">
+      Texto
+      <input formControlName="texto" placeholder="Escribe para buscar..." />
+    </label>
+    <button type="submit">Buscar</button>
+    <button type="button" class="secundario" (click)="limpiarBusqueda()">Ver todos</button>
+  </form>
+
+  @if (libros().length === 0) {
+    <p class="vacio">No hay libros para mostrar.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Autor</th>
+          <th>ISBN</th>
+          <th>Disponibilidad</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (libro of libros(); track libro.id) {
+          <tr>
+            <td>{{ libro.titulo }}</td>
+            <td>{{ libro.autor }}</td>
+            <td>{{ libro.isbn }}</td>
+            <td>
+              @if (disponiblesDe(libro.id) > 0) {
+                <span class="badge badge-disponible">{{ disponiblesDe(libro.id) }} de {{ ejemplaresDe(libro.id).length }} disponibles</span>
+              } @else {
+                <span class="badge badge-perdido">No disponible ({{ ejemplaresDe(libro.id).length }} ejemplares)</span>
+              }
+            </td>
+            <td class="acciones">
+              <button type="button" class="secundario" (click)="alternarEjemplares(libro.id)">
+                {{ libroAbiertoId() === libro.id ? 'Ocultar' : 'Ejemplares' }}
+              </button>
+              <button type="button" class="peligro" [disabled]="guardando()" (click)="eliminarLibro(libro)">Eliminar</button>
+            </td>
+          </tr>
+
+          @if (libroAbiertoId() === libro.id) {
+            <tr class="detalle">
+              <td colspan="5">
+                <div class="formulario">
+                  <label>
+                    Código del nuevo ejemplar
+                    <input #codigo placeholder="EJ-001" (keydown.enter)="agregarEjemplar(libro, codigo)" />
+                  </label>
+                  <button type="button" [disabled]="guardando()" (click)="agregarEjemplar(libro, codigo)">Agregar ejemplar</button>
+                </div>
+
+                @if (ejemplaresDe(libro.id).length === 0) {
+                  <p class="vacio">Este libro aún no tiene ejemplares.</p>
+                } @else {
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Código</th>
+                        <th>Estado</th>
+                        <th>Responsable (RN05)</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (ejemplar of ejemplaresDe(libro.id); track ejemplar.id) {
+                        <tr>
+                          <td>{{ ejemplar.codigo }}</td>
+                          <td><app-estado-badge [estado]="ejemplar.estado" /></td>
+                          <td>{{ ejemplar.usuarioResponsable?.nombre ?? '—' }}</td>
+                          <td class="acciones">
+                            <button
+                              type="button"
+                              class="secundario"
+                              [disabled]="guardando() || ejemplar.estado !== 'DISPONIBLE'"
+                              (click)="marcarComoDanado(ejemplar)"
+                            >
+                              Dañado
+                            </button>
+                            <button
+                              type="button"
+                              class="peligro"
+                              [disabled]="guardando() || ejemplar.estado === 'PERDIDO'"
+                              (click)="marcarComoPerdido(ejemplar)"
+                            >
+                              Perdido
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                }
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  }
+</section>

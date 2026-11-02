@@ -1,0 +1,69 @@
+<h1>Usuarios</h1>
+
+<section class="tarjeta">
+  <h2>Registrar usuario</h2>
+  <form [formGroup]="form" (ngSubmit)="registrar()" class="formulario">
+    <label>
+      Nombre
+      <input formControlName="nombre" placeholder="Ana Gómez" />
+    </label>
+    <label>
+      Documento
+      <input formControlName="documento" placeholder="1001" />
+    </label>
+    <label>
+      Contraseña inicial
+      <input type="password" formControlName="contrasena" autocomplete="new-password" />
+    </label>
+    <label>
+      Tipo
+      <select formControlName="tipo">
+        <option value="ESTUDIANTE">Estudiante</option>
+        <option value="DOCENTE">Docente</option>
+        <option value="ADMIN">Administrador</option>
+      </select>
+    </label>
+    <button type="submit" [disabled]="guardando()">Registrar</button>
+  </form>
+  @if (form.touched && form.invalid) {
+    <p class="error-campo">Nombre, documento y una contraseña de al menos 6 caracteres son obligatorios.</p>
+  }
+  <p class="ayuda">
+    Estudiante: máximo {{ reglas.ESTUDIANTE.limitePrestamos }} préstamos, {{ reglas.ESTUDIANTE.plazoDias }} días ·
+    Docente: máximo {{ reglas.DOCENTE.limitePrestamos }} préstamos, {{ reglas.DOCENTE.plazoDias }} días.
+  </p>
+</section>
+
+<section class="tarjeta">
+  <h2>Usuarios registrados</h2>
+  @if (usuarios().length === 0) {
+    <p class="vacio">No hay usuarios registrados.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Nombre</th>
+          <th>Documento</th>
+          <th>Tipo</th>
+          <th>Límite / plazo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (usuario of usuarios(); track usuario.id) {
+          <tr>
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.documento }}</td>
+            <td>{{ usuario.tipo }}</td>
+            <td>{{ limiteYPlazo(usuario.tipo) }}</td>
+            <td class="acciones">
+              <button type="button" class="peligro" [disabled]="guardando()" (click)="eliminar(usuario)">Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

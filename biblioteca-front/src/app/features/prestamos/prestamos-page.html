@@ -1,0 +1,78 @@
+<h1>Préstamos</h1>
+
+<section class="tarjeta">
+  <h2>Registrar préstamo</h2>
+  <form [formGroup]="form" (ngSubmit)="prestar()" class="formulario">
+    <label class="crece">
+      Usuario
+      <select formControlName="usuarioId">
+        <option [ngValue]="null" disabled>Selecciona un usuario</option>
+        @for (usuario of usuarios(); track usuario.id) {
+          <option [ngValue]="usuario.id">{{ usuario.nombre }} · {{ usuario.documento }} ({{ usuario.tipo }})</option>
+        }
+      </select>
+    </label>
+    <label class="crece">
+      Ejemplar disponible
+      <select formControlName="ejemplarId">
+        <option [ngValue]="null" disabled>Selecciona un ejemplar</option>
+        @for (ejemplar of ejemplaresDisponibles(); track ejemplar.id) {
+          <option [ngValue]="ejemplar.id">{{ ejemplar.codigo }} · {{ ejemplar.libro.titulo }}</option>
+        }
+      </select>
+    </label>
+    <button type="submit" [disabled]="guardando()">Prestar</button>
+  </form>
+  @if (form.touched && form.invalid) {
+    <p class="error-campo">Selecciona el usuario y el ejemplar.</p>
+  }
+  <p class="ayuda">
+    La fecha de préstamo es hoy y el sistema calcula el vencimiento: {{ reglas.ESTUDIANTE.plazoDias }} días para
+    estudiantes y {{ reglas.DOCENTE.plazoDias }} para docentes.
+  </p>
+</section>
+
+<section class="tarjeta">
+  <h2>Historial</h2>
+  @if (prestamosOrdenados().length === 0) {
+    <p class="vacio">No hay préstamos registrados.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Usuario</th>
+          <th>Ejemplar</th>
+          <th>Prestado</th>
+          <th>Vence</th>
+          <th>Devuelto</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (prestamo of prestamosOrdenados(); track prestamo.id) {
+          <tr [class.vencido]="estaVencido(prestamo)">
+            <td>{{ prestamo.id }}</td>
+            <td>{{ prestamo.usuario.nombre }}</td>
+            <td>{{ prestamo.ejemplar.codigo }} · {{ prestamo.ejemplar.libro.titulo }}</td>
+            <td>{{ prestamo.fechaPrestamo }}</td>
+            <td>
+              {{ prestamo.fechaVencimiento }}
+              @if (estaVencido(prestamo)) {
+                <span class="badge badge-perdido">VENCIDO</span>
+              }
+            </td>
+            <td>{{ prestamo.fechaDevolucion ?? '—' }}</td>
+            <td><app-estado-badge [estado]="prestamo.estado" /></td>
+            <td class="acciones">
+              @if (prestamo.estado === 'ACTIVO') {
+                <button type="button" [disabled]="guardando()" (click)="devolver(prestamo)">Devolver</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
