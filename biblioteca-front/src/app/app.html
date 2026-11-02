@@ -1,0 +1,20 @@
+@if (sesion.usuario(); as usuario) {
+  <header class="barra">
+    <span class="marca">Biblioteca</span>
+    <nav>
+      @for (enlace of enlaces(); track enlace.ruta) {
+        <a [routerLink]="enlace.ruta" routerLinkActive="activo">{{ enlace.texto }}</a>
+      }
+    </nav>
+    <div class="usuario-actual">
+      <span>{{ usuario.nombre }} · {{ usuario.tipo }}</span>
+      <button type="button" class="salir" (click)="cerrarSesion()">Salir</button>
+    </div>
+  </header>
+}
+
+<main class="contenido">
+  <router-outlet />
+</main>
+
+<app-notificaciones />
